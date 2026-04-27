@@ -110,13 +110,17 @@ Some Buhl **installers** or **updaters** fail under Wine (e.g. `%TEMP%` / ACL ch
 
 The portable tree may include **.NET**-based helpers. If something fails, you may add to the same prefix, e.g. with winetricks: `dotnet472` (large download). YMMV.
 
+### Menu / desktop icon shows a blank “document”
+
+KDE and other desktops often **do not render `.ico`** paths in `.desktop` files reliably (especially **symlinks** to an ICO on another disk). `install.sh` therefore converts `wisoakt.ico` to **PNG** files under `~/.local/share/icons/hicolor/*/apps/wiso-steuer-wine.png` and sets `Icon=wiso-steuer-wine`. Re-run `./install.sh "<portable-path>"` after moving the portable folder. If the icon still does not refresh, run `kbuildsycoca6 --noincremental` (Plasma 6) or log out and back in.
+
 ## Uninstall (helper / menu entries only)
 
 - Remove launcher from the portable folder: `wiso-mit-wine.sh` (optional).
 - Remove desktop files:  
   `~/.local/share/applications/wiso-steuer-wine.desktop`  
   `~/.local/share/applications/wiso-steuer-wine-vdesktop.desktop`
-- Remove icon link if present: `~/.local/share/icons/wiso-steuer-wine.ico`
+- Remove installed icons: `rm -rf ~/.local/share/icons/hicolor/*/apps/wiso-steuer-wine.png` and any `~/.local/share/icons/wiso-steuer-wine.ico` symlink left from older installs
 - Optional: remove the Wine prefix directory (backs up **nothing** from WISO; only Wine’s fake Windows):  
   `rm -rf ~/.local/share/wineprefixes/wiso2026`
 

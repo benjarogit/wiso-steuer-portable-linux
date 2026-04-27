@@ -110,13 +110,17 @@ Manche offiziellen **Setup-/Update-Programme** scheitern unter Wine. Die **Porta
 
 Falls Zusatzprogramme (z. B. .NET) fehlen, kann man im **gleichen Prefix** z. B. per Winetricks **`dotnet472`** nachrüsten (groß, experimentell).
 
+### Menü-/Desktop-Icon nur als leeres Blatt / Kette
+
+KDE (und andere) rendern **`.ico`-Pfade** in `.desktop`-Dateien oft **nicht zuverlässig**, vor allem **Symlinks** auf eine ICO auf einem anderen Laufwerk. **`install.sh`** wandelt `wisoakt.ico` deshalb in **PNG** unter `~/.local/share/icons/hicolor/*/apps/wiso-steuer-wine.png` um und setzt **`Icon=wiso-steuer-wine`**. Nach Verschieben des Portable-Ordners **`install.sh` erneut ausführen**. Wenn das Icon nicht aktualisiert: `kbuildsycoca6 --noincremental` (Plasma 6) oder neu anmelden.
+
 ## Deinstallieren (nur Helfer / Menüeinträge)
 
 - Optional `wiso-mit-wine.sh` im Portable-Ordner löschen.
 - Desktop-Dateien löschen:  
   `~/.local/share/applications/wiso-steuer-wine.desktop`  
   `~/.local/share/applications/wiso-steuer-wine-vdesktop.desktop`
-- Optional Symlink: `~/.local/share/icons/wiso-steuer-wine.ico`
+- Icons: `rm -rf ~/.local/share/icons/hicolor/*/apps/wiso-steuer-wine.png` sowie ggf. alten Symlink `~/.local/share/icons/wiso-steuer-wine.ico` / `wiso-steuer-2026-wine.ico`
 - Optional ganzes Wine-Prefix **nur** wenn du es nicht mehr brauchst (WISO-Dateien im Portable-Ordner bleiben unberührt):  
   `rm -rf ~/.local/share/wineprefixes/wiso2026`
 

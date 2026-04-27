@@ -40,12 +40,39 @@ APP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 ICON_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/icons"
 mkdir -p "$APP_DIR" "$ICON_DIR"
 
-ICON_LINK="$ICON_DIR/wiso-steuer-wine.ico"
+# KDE/GNOME often ignore or mishandle .ico paths in .desktop files (especially symlinks).
+# Install PNGs under ~/.local/share/icons/hicolor/.../apps/ and use Icon=wiso-steuer-wine.
+ICON_LINE='Icon=wine'
+ICON_THEME_NAME="wiso-steuer-wine"
 if [ -f "$ICON_SRC" ]; then
-	ln -sfn "$ICON_SRC" "$ICON_LINK"
-	echo "Icon symlink: $ICON_LINK -> $ICON_SRC"
+	HICOLOR="$ICON_DIR/hicolor"
+	if command -v magick >/dev/null 2>&1; then
+		for _s in 48 64 128 256; do
+			mkdir -p "$HICOLOR/${_s}x${_s}/apps"
+			magick "${ICON_SRC}[0]" -resize "${_s}x${_s}" "$HICOLOR/${_s}x${_s}/apps/${ICON_THEME_NAME}.png" 2>/dev/null || true
+		done
+		if [ -f "$HICOLOR/48x48/apps/${ICON_THEME_NAME}.png" ]; then
+			ICON_LINE="Icon=${ICON_THEME_NAME}"
+			if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+				gtk-update-icon-cache -f -t "$HICOLOR" 2>/dev/null || true
+			fi
+			if command -v kbuildsycoca6 >/dev/null 2>&1; then
+				kbuildsycoca6 --noincremental 2>/dev/null || true
+			elif command -v kbuildsycoca5 >/dev/null 2>&1; then
+				kbuildsycoca5 --noincremental 2>/dev/null || true
+			fi
+			echo "Installed PNG icons: $HICOLOR/*/apps/${ICON_THEME_NAME}.png (Icon=${ICON_THEME_NAME})"
+		else
+			cp -f "$ICON_SRC" "$ICON_DIR/${ICON_THEME_NAME}.ico"
+			ICON_LINE="Icon=$ICON_DIR/${ICON_THEME_NAME}.ico"
+			echo "ImageMagick failed; copied ICO to: $ICON_DIR/${ICON_THEME_NAME}.ico"
+		fi
+	else
+		cp -f "$ICON_SRC" "$ICON_DIR/${ICON_THEME_NAME}.ico"
+		ICON_LINE="Icon=$ICON_DIR/${ICON_THEME_NAME}.ico"
+		echo "No 'magick' found; copied ICO to: $ICON_DIR/${ICON_THEME_NAME}.ico (install imagemagick for better KDE icons)"
+	fi
 else
-	ICON_LINK=""
 	echo "Note: wisoakt.ico not found; .desktop files will use generic wine icon."
 fi
 
@@ -57,11 +84,6 @@ LAUNCHER="$TARGET/wiso-mit-wine.sh"
 LAUNCH_ESC="$(_escape_for_desktop "$LAUNCHER")"
 
 if [ -z "${SKIP_DESKTOP:-}" ]; then
-	ICON_LINE='Icon=wine'
-	if [ -n "$ICON_LINK" ]; then
-		ICON_LINE="Icon=$ICON_LINK"
-	fi
-
 	cat >"$APP_DIR/wiso-steuer-wine.desktop" <<EOF
 [Desktop Entry]
 Type=Application
