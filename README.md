@@ -14,6 +14,6 @@
 | Releases | [AppImage + tar.gz](https://github.com/benjarogit/rezeptor/releases) |
 | Docs | [Rezeptor Docs](https://benjarogit.github.io/rezeptor/) |
 
-Please open new issues and pull requests on **Rezeptor**. Existing issues below have been updated with the same pointer.
+Please open new issues and pull requests on **Rezeptor**.
 
 Thank you for using the earlier project — welcome to Rezeptor **1.0.0**.
